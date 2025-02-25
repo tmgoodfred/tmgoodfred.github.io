@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Overwatch 5v5 Team Randomizer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #121212; color: #ffffff; }
+        .container { max-width: 600px; background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); margin-top: 20px; }
+        .form-control { margin-bottom: 10px; background: #2a2a2a; color: white; border: 1px solid #444; }
+        .form-control::placeholder { color: #888; }
+        textarea { height: 140px; resize: none; background: #2a2a2a; color: white; border: 1px solid #444; }
+        .btn-random { width: 100%; margin-top: 10px; }
+        .btn-orange { background: #ff9800; border: none; color: #121212; }
+        .btn-orange:hover { background: #e68900; }
+        .btn-blue { background: #007bff; border: none; }
+        .btn-blue:hover { background: #0062cc; }
+    </style>
+</head>
+<body>
+
+<div class="container text-center">
+    <h1 class="mb-4">Overwatch 5v5 Team Randomizer</h1>
+
+    <div class="row">
+        <div class="col">
+            <h5>Team 1 Leader</h5>
+            <input type="text" id="teamLeader1" class="form-control" placeholder="Enter Team 1 Leader">
+        </div>
+        <div class="col">
+            <h5>Team 2 Leader</h5>
+            <input type="text" id="teamLeader2" class="form-control" placeholder="Enter Team 2 Leader">
+        </div>
+    </div>
+
+    <h5 class="mt-3">Players</h5>
+    <div class="row">
+        <div class="col">
+            <input type="text" class="form-control player" placeholder="Player 1">
+            <input type="text" class="form-control player" placeholder="Player 2">
+            <input type="text" class="form-control player" placeholder="Player 3">
+            <input type="text" class="form-control player" placeholder="Player 4">
+        </div>
+        <div class="col">
+            <input type="text" class="form-control player" placeholder="Player 5">
+            <input type="text" class="form-control player" placeholder="Player 6">
+            <input type="text" class="form-control player" placeholder="Player 7">
+            <input type="text" class="form-control player" placeholder="Player 8">
+        </div>
+    </div>
+
+    <button class="btn btn-orange btn-random" id="randomizeBtn">Randomize Teams</button>
+    <button class="btn btn-blue btn-random" id="randomizeWithRolesBtn">Randomize Teams with Roles</button>
+
+    <div class="row mt-3">
+        <div class="col">
+            <h5>Team 1</h5>
+            <textarea id="team1Output" class="form-control" readonly></textarea>
+        </div>
+        <div class="col">
+            <h5>Team 2</h5>
+            <textarea id="team2Output" class="form-control" readonly></textarea>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            let date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        let nameEQ = name + "=";
+        let ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i].trim();
+            if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length));
+        }
+        return "";
+    }
+
+    function saveFormData() {
+        setCookie("teamLeader1", document.getElementById("teamLeader1").value, 30);
+        setCookie("teamLeader2", document.getElementById("teamLeader2").value, 30);
+        let players = Array.from(document.getElementsByClassName("player")).map(input => input.value);
+        setCookie("players", JSON.stringify(players), 30);
+    }
+
+    function loadFormData() {
+        document.getElementById("teamLeader1").value = getCookie("teamLeader1");
+        document.getElementById("teamLeader2").value = getCookie("teamLeader2");
+        let players = JSON.parse(getCookie("players") || "[]");
+        document.querySelectorAll(".player").forEach((input, index) => {
+            input.value = players[index] || "";
+        });
+    }
+
+    loadFormData();
+
+    document.getElementById("randomizeBtn").addEventListener("click", function () {
+        randomizeTeams(false);
+    });
+    document.getElementById("randomizeWithRolesBtn").addEventListener("click", function () {
+        randomizeTeams(true);
+    });
+
+    function randomizeTeams(assignRoles) {
+        const teamLeader1 = document.getElementById("teamLeader1").value.trim();
+        const teamLeader2 = document.getElementById("teamLeader2").value.trim();
+
+        const players = Array.from(document.getElementsByClassName("player"))
+            .map(input => input.value.trim())
+            .filter(player => player !== "");
+
+        if (players.length < 2 || !teamLeader1 || !teamLeader2) {
+            alert("Please enter at least 2 players and 2 team leaders.");
+            return;
+        }
+
+        players.sort(() => Math.random() - 0.5);
+
+        let totalPlayers = players.length + 2;
+        let team1Size = Math.ceil(totalPlayers / 2);
+        let team2Size = totalPlayers - team1Size;
+
+        const team1 = [teamLeader1, ...players.slice(0, team1Size - 1)];
+        const team2 = [teamLeader2, ...players.slice(team1Size - 1)];
+
+        if (assignRoles) {
+            const roles = ["Tank", "Healer", "DPS", "DPS", "DPS"];
+            team1.sort(() => Math.random() - 0.5);
+            team2.sort(() => Math.random() - 0.5);
+
+            document.getElementById("team1Output").value = team1.map((player, i) => `${player} - ${roles[i] || "DPS"}`).join("\n");
+            document.getElementById("team2Output").value = team2.map((player, i) => `${player} - ${roles[i] || "DPS"}`).join("\n");
+        } else {
+            document.getElementById("team1Output").value = team1.join("\n");
+            document.getElementById("team2Output").value = team2.join("\n");
+        }
+    }
+</script>
+
+</body>
+</html>
