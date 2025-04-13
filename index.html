@@ -132,20 +132,17 @@
             return;
         }
 
-        // Combine team leaders and players into one array
-        const allPlayers = [teamLeader1, teamLeader2, ...players];
-
-        // Shuffle the players (not including leaders) randomly
+        // Shuffle only the regular players (non-leaders)
         const shuffledPlayers = players.sort(() => Math.random() - 0.5);
 
-        // Insert the team leaders back at the top
+        // Divide players into two teams
         const finalTeam1 = [teamLeader1, ...shuffledPlayers.slice(0, 3)];
         const finalTeam2 = [teamLeader2, ...shuffledPlayers.slice(3)];
 
         // Roles for everyone (1 Tank, 2 DPS, 2 Healers)
         const roles = ["Tank", "DPS", "DPS", "Healer", "Healer", "DPS", "DPS", "Healer"];
 
-        // Assign roles to the shuffled players and team leaders
+        // Assign roles to the players
         const team1Roles = roles.slice(0, 4);
         const team2Roles = roles.slice(4, 8);
 
