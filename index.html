@@ -132,25 +132,28 @@
             return;
         }
 
-        // Shuffle only the regular players (non-leaders)
-        const shuffledPlayers = players.sort(() => Math.random() - 0.5);
+        players.sort(() => Math.random() - 0.5);
 
-        // Divide players into two teams
-        const finalTeam1 = [teamLeader1, ...shuffledPlayers.slice(0, 3)];
-        const finalTeam2 = [teamLeader2, ...shuffledPlayers.slice(3)];
+        let totalPlayers = players.length + 2;
+        let team1Size = Math.ceil(totalPlayers / 2);
+        let team2Size = totalPlayers - team1Size;
 
-        // Roles for everyone (1 Tank, 2 DPS, 2 Healers)
-        const roles = ["Tank", "DPS", "DPS", "Healer", "Healer", "DPS", "DPS", "Healer"];
+        const team1 = [teamLeader1, ...players.slice(0, team1Size - 1)];
+        const team2 = [teamLeader2, ...players.slice(team1Size - 1)];
 
-        // Assign roles to the players
-        const team1Roles = roles.slice(0, 4);
-        const team2Roles = roles.slice(4, 8);
+        if (assignRoles) {
+            const roles = ["Tank", "Healer", "Healer", "DPS", "DPS"];
+            team1.sort(() => Math.random() - 0.5);
+            team2.sort(() => Math.random() - 0.5);
 
-        // Output team compositions with roles
-        document.getElementById("team1Output").value = finalTeam1.map((player, i) => `${player} - ${team1Roles[i]}`).join("\n");
-        document.getElementById("team2Output").value = finalTeam2.map((player, i) => `${player} - ${team2Roles[i]}`).join("\n");
+            document.getElementById("team1Output").value = team1.map((player, i) => `${player} - ${roles[i] || "DPS"}`).join("\n");
+            document.getElementById("team2Output").value = team2.map((player, i) => `${player} - ${roles[i] || "DPS"}`).join("\n");
+        } else {
+            document.getElementById("team1Output").value = team1.join("\n");
+            document.getElementById("team2Output").value = team2.join("\n");
+        }
     }
 </script>
-
+<div></div>
 </body>
 </html>
