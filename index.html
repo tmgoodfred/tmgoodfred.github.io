@@ -132,26 +132,24 @@
             return;
         }
 
+        // Shuffle players
         players.sort(() => Math.random() - 0.5);
 
-        let totalPlayers = players.length + 2;
-        let team1Size = Math.ceil(totalPlayers / 2);
-        let team2Size = totalPlayers - team1Size;
+        // Split players between the two teams
+        let team1 = [teamLeader1, ...players.slice(0, 4)];
+        let team2 = [teamLeader2, ...players.slice(4)];
 
-        const team1 = [teamLeader1, ...players.slice(0, team1Size - 1)];
-        const team2 = [teamLeader2, ...players.slice(team1Size - 1)];
-
+        // Assign roles: 1 Tank, 2 Healers, 2 DPS per team
+        const roles = ["Tank", "Healer", "Healer", "DPS", "DPS"];
+        
         if (assignRoles) {
-            const roles = ["Tank", "Healer", "DPS", "DPS", "DPS"];
-            team1.sort(() => Math.random() - 0.5);
-            team2.sort(() => Math.random() - 0.5);
-
-            document.getElementById("team1Output").value = team1.map((player, i) => `${player} - ${roles[i] || "DPS"}`).join("\n");
-            document.getElementById("team2Output").value = team2.map((player, i) => `${player} - ${roles[i] || "DPS"}`).join("\n");
-        } else {
-            document.getElementById("team1Output").value = team1.join("\n");
-            document.getElementById("team2Output").value = team2.join("\n");
+            // Randomize roles within each team
+            team1 = team1.map((player, index) => `${player} - ${roles[index]}`);
+            team2 = team2.map((player, index) => `${player} - ${roles[index]}`);
         }
+
+        document.getElementById("team1Output").value = team1.join("\n");
+        document.getElementById("team2Output").value = team2.join("\n");
     }
 </script>
 <div></div>
